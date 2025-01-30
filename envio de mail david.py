@@ -1,15 +1,15 @@
 import os
-import win32com.client as win32
 from datetime import datetime
+import win32com.client as win32
 
-# Obtener el directorio base del usuario actual
-base_dir = os.path.expanduser("~/Documents")
+# Directorio donde se encuentra el archivo Excel
+base_dir = r"C:\Users\Lucian\Desktop\david"
 
 # Obtener la fecha de hoy en formato YYYYMMDD
 fecha_hoy = datetime.now().strftime('%Y-%m-%d')
 
 # Ruta del archivo Excel
-archivo_excel = os.path.join(base_dir, f'Excel david_{fecha_hoy}', f'reporte_{fecha_hoy}.xlsx')
+archivo_excel = os.path.join(base_dir, f'reporte_{fecha_hoy}.xlsx')
 
 # Enviar el archivo Excel por correo electrónico usando Outlook
 def enviar_correo(archivo):
@@ -22,10 +22,5 @@ def enviar_correo(archivo):
     mail.Send()
     print(f"Correo enviado con el archivo {archivo}")
 
-# Verificar si el archivo Excel existe y enviarlo por correo
-if os.path.exists(archivo_excel):
-    enviar_correo(archivo_excel)
-else:
-    print(f"El archivo {archivo_excel} no existe.")
-
-print("Operación completada.")
+# Enviar el correo con el archivo Excel
+enviar_correo(archivo_excel)

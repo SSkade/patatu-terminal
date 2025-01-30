@@ -3,18 +3,18 @@ import pandas as pd
 from datetime import datetime
 
 # Obtener el directorio base del usuario actual
-base_dir = os.path.expanduser("~/Documents")
+base_dir = os.path.expanduser("~/Desktop")
 
 # Obtener la fecha de hoy en formato YYYYMMDD
 fecha_hoy = datetime.now().strftime('%Y-%m-%d')
 
-# Directorio donde se encuentran los archivos .txt
-directorio_txt = os.path.join(base_dir, f'TXT david_{fecha_hoy}')
+# Configuración de los directorios de origen
+david_folder = os.path.join(base_dir, "david", f'TXT_{fecha_hoy}')
+hemel_folder = os.path.join(base_dir, "hemel", f'TXT_{fecha_hoy}')
+nico_folder = os.path.join(base_dir, "nico", f'TXT_{fecha_hoy}')
 
-# Verificar si el directorio de Excel existe, si no, crearlo
-directorio_excel = os.path.join(base_dir, f'Excel david_{fecha_hoy}')
-if not os.path.exists(directorio_excel):
-    os.makedirs(directorio_excel)
+# Lista de directorios de origen
+directorios_origen = [david_folder, hemel_folder, nico_folder]
 
 # Función para extraer información de un archivo .txt
 def extraer_informacion(file_path):
@@ -43,26 +43,40 @@ def extraer_informacion(file_path):
     
     return info
 
-# Lista para almacenar la información extraída
-datos = []
+# Recorrer todos los archivos .txt en los directorios de origen
+for directorio_origen in directorios_origen:
+    datos = []
+    if os.path.exists(directorio_origen):
+        for archivo in os.listdir(directorio_origen):
+            if archivo.endswith('.txt'):
+                file_path = os.path.join(directorio_origen, archivo)
+                info = extraer_informacion(file_path)
+                datos.append(info)
+        
+        # Crear un DataFrame con la información extraída
+        df = pd.DataFrame(datos)
 
-# Recorrer todos los archivos .txt en el directorio
-for archivo in os.listdir(directorio_txt):
-    if archivo.endswith('.txt'):
-        file_path = os.path.join(directorio_txt, archivo)
-        info = extraer_informacion(file_path)
-        datos.append(info)
+        # Mostrar el DataFrame
+        print(df)
 
-# Crear un DataFrame con la información extraída
-df = pd.DataFrame(datos)
+        # Determinar la carpeta principal (david, hemel o nico)
+        if "david" in directorio_origen:
+            directorio_excel = os.path.join(base_dir, "david")
+        elif "hemel" in directorio_origen:
+            directorio_excel = os.path.join(base_dir, "hemel")
+        elif "nico" in directorio_origen:
+            directorio_excel = os.path.join(base_dir, "nico")
 
-# Mostrar el DataFrame
-print(df)
+        # Verificar si el directorio de Excel existe, si no, crearlo
+        if not os.path.exists(directorio_excel):
+            os.makedirs(directorio_excel)
 
-# Guardar el DataFrame en un archivo Excel (.xlsx)
-archivo_excel = os.path.join(directorio_excel, f'reporte_{fecha_hoy}.xlsx')
-df.to_excel(archivo_excel, index=False, engine='openpyxl')
+        # Guardar el DataFrame en un archivo Excel (.xlsx)
+        archivo_excel = os.path.join(directorio_excel, f'reporte_{fecha_hoy}.xlsx')
+        df.to_excel(archivo_excel, index=False, engine='openpyxl')
 
-# Guardar el DataFrame en un archivo CSV
-#archivo_csv = os.path.join(directorio_excel, f'reporte_{fecha_hoy}.csv')
-#df.to_csv(archivo_csv, index=False)
+        # Guardar el DataFrame en un archivo CSV (opcional)
+        # archivo_csv = os.path.join(directorio_excel, f'reporte_{fecha_hoy}.csv')
+        # df.to_csv(archivo_csv, index=False)
+
+print("Procesamiento completado.")
